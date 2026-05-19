@@ -22,7 +22,7 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 if [[ ! -d "$DEPLOY_PATH/.git" ]]; then
-  rm -rf "$DEPLOY_PATH"
+  mkdir -p "$DEPLOY_PATH"
   git clone --branch "$DEPLOY_BRANCH" "$REPO_URL" "$DEPLOY_PATH"
 fi
 
