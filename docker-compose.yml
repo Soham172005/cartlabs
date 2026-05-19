@@ -1,0 +1,158 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cartlabs
+      POSTGRES_USER: cartlabs
+      POSTGRES_PASSWORD: cartlabs
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cartlabs -d cartlabs"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: auth_service
+    environment:
+      SERVICE_NAME: auth_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+
+  product-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: product_service
+    environment:
+      SERVICE_NAME: product_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8002:8000"
+
+  cart-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: cart_service
+    environment:
+      SERVICE_NAME: cart_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8003:8000"
+
+  recommendation-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: recommendation_service
+    environment:
+      SERVICE_NAME: recommendation_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8004:8000"
+
+  order-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: order_service
+    environment:
+      SERVICE_NAME: order_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8005:8000"
+
+  tracking-service:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: tracking_service
+    environment:
+      SERVICE_NAME: tracking_service
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8006:8000"
+
+  api-gateway:
+    build:
+      context: ./backend
+      args:
+        SERVICE_DIR: gateway
+    environment:
+      SERVICE_NAME: gateway
+      DATABASE_URL: postgres://cartlabs:cartlabs@postgres:5432/cartlabs
+      AUTH_SERVICE_URL: http://auth-service:8000
+      PRODUCT_SERVICE_URL: http://product-service:8000
+      CART_SERVICE_URL: http://cart-service:8000
+      RECOMMENDATION_SERVICE_URL: http://recommendation-service:8000
+      ORDER_SERVICE_URL: http://order-service:8000
+      TRACKING_SERVICE_URL: http://tracking-service:8000
+      JWT_SECRET: change-me-in-production
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOW_ALL: "true"
+    depends_on:
+      - auth-service
+      - product-service
+      - cart-service
+      - recommendation-service
+      - order-service
+      - tracking-service
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:

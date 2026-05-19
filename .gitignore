@@ -1,0 +1,20 @@
+# Terraform local state and plans
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/*.tfplan
+**/terraform.tfvars
+
+# Local dependency/build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.npm-cache/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+*.pem
+.env
+.env.*

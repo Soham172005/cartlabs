@@ -1,0 +1,5 @@
+Django==5.0.7
+PyJWT==2.8.0
+psycopg[binary]==3.2.1
+requests==2.32.3
+gunicorn==22.0.0
