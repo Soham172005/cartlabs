@@ -8,9 +8,8 @@ This pipeline validates and deploys CartLabs to the single EC2 instance created 
 2. Compiles Django service Python files.
 3. Installs frontend dependencies and runs a Vite production build.
 4. Validates Docker Compose configuration.
-5. SSHes into the EC2 instance.
-6. Pulls the latest `main` branch into `/opt/cartlabs`.
-7. Builds and restarts CartLabs with Docker Compose.
+5. Pulls the latest `main` branch into `/opt/cartlabs` on the same EC2 host.
+6. Builds and restarts CartLabs with Docker Compose.
 
 ## Jenkins Requirements
 
@@ -18,7 +17,6 @@ Install these Jenkins plugins:
 
 - Git
 - Pipeline
-- SSH Agent
 
 The Jenkins agent needs:
 
@@ -27,18 +25,18 @@ The Jenkins agent needs:
 - Node.js 20+
 - Docker and Docker Compose plugin, if you want local Compose validation
 
-Use a Linux agent for this Jenkinsfile. The deploy stage uses `ssh`, `scp` and shell scripts.
+Use a Linux agent for this Jenkinsfile. For your low-credit setup, Jenkins runs on the same EC2 instance as CartLabs and deploys locally.
 
-## Jenkins Credentials
+## EC2 Permissions
 
-Create an SSH private key credential:
+Allow the Jenkins user to use Docker and write to `/opt/cartlabs`:
 
-- Kind: `SSH Username with private key`
-- ID: `cartlabs-ec2-ssh-key`
-- Username: `ubuntu`
-- Private key: contents of your `cart_labs.pem`
-
-Do not commit the `.pem` file to GitHub.
+```bash
+sudo usermod -aG docker jenkins
+sudo mkdir -p /opt/cartlabs
+sudo chown -R jenkins:jenkins /opt/cartlabs
+sudo systemctl restart jenkins
+```
 
 ## Pipeline Job Setup
 
@@ -50,8 +48,6 @@ Do not commit the `.pem` file to GitHub.
 
 ```text
 REPO_URL=https://github.com/YOUR_USERNAME/cartlabs.git
-DEPLOY_HOST=13.200.16.11
-DEPLOY_USER=ubuntu
 DEPLOY_PATH=/opt/cartlabs
 PUBLIC_API_BASE_URL=http://13.200.16.11:8000/api
 GIT_BRANCH=main
@@ -59,18 +55,14 @@ GIT_BRANCH=main
 
 ## First Deployment
 
-If Jenkins runs on a separate machine, set `REPO_URL` on the EC2 deploy command or ensure `/opt/cartlabs` already contains the cloned repository.
-
-Manual first clone option:
+Before the first deployment, make sure the Jenkins user owns the deployment directory:
 
 ```bash
-cd /opt
-sudo rm -rf cartlabs
-sudo git clone https://github.com/YOUR_USERNAME/cartlabs.git cartlabs
-sudo chown -R ubuntu:ubuntu /opt/cartlabs
+sudo mkdir -p /opt/cartlabs
+sudo chown -R jenkins:jenkins /opt/cartlabs
 ```
 
-Then Jenkins can keep it updated.
+Then Jenkins can clone and keep it updated.
 
 ## Production URLs
 

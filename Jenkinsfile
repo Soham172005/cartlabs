@@ -9,8 +9,6 @@ pipeline {
 
   parameters {
     string(name: 'REPO_URL', defaultValue: 'https://github.com/YOUR_USERNAME/cartlabs.git', description: 'GitHub repository URL used by the EC2 deploy script')
-    string(name: 'DEPLOY_HOST', defaultValue: '13.200.16.11', description: 'Production EC2 public IP or DNS')
-    string(name: 'DEPLOY_USER', defaultValue: 'ubuntu', description: 'SSH user for production EC2')
     string(name: 'DEPLOY_PATH', defaultValue: '/opt/cartlabs', description: 'Application directory on production EC2')
     string(name: 'PUBLIC_API_BASE_URL', defaultValue: 'http://13.200.16.11:8000/api', description: 'Frontend API URL baked into the production build')
     string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Branch to deploy')
@@ -62,18 +60,19 @@ pipeline {
       }
     }
 
-    stage('Deploy To EC2') {
+    stage('Deploy Locally On EC2') {
       when {
         expression { params.GIT_BRANCH == 'main' }
       }
       steps {
-        sshagent(credentials: ['cartlabs-ec2-ssh-key']) {
-          sh '''
-            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "mkdir -p ${DEPLOY_PATH}"
-            scp -o StrictHostKeyChecking=no scripts/deploy-prod.sh ${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/cartlabs-deploy-prod.sh
-            ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "chmod +x /tmp/cartlabs-deploy-prod.sh && REPO_URL='${REPO_URL}' PUBLIC_API_BASE_URL='${PUBLIC_API_BASE_URL}' GIT_BRANCH='${GIT_BRANCH}' DEPLOY_PATH='${DEPLOY_PATH}' /tmp/cartlabs-deploy-prod.sh"
-          '''
-        }
+        sh '''
+          chmod +x scripts/deploy-prod.sh
+          REPO_URL="${REPO_URL}" \
+          PUBLIC_API_BASE_URL="${PUBLIC_API_BASE_URL}" \
+          GIT_BRANCH="${GIT_BRANCH}" \
+          DEPLOY_PATH="${DEPLOY_PATH}" \
+          scripts/deploy-prod.sh
+        '''
       }
     }
   }
