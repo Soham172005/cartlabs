@@ -19,8 +19,8 @@ output "ssh_command" {
 }
 
 output "frontend_url" {
-  description = "Temporary frontend URL while running Vite through Docker Compose."
-  value       = "http://${aws_instance.cartlabs.public_ip}:5173"
+  description = "Production frontend URL."
+  value       = "http://${aws_instance.cartlabs.public_ip}"
 }
 
 output "api_gateway_url" {

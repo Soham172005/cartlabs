@@ -55,7 +55,7 @@ docker compose up -d --build
 
 The outputs include temporary URLs for:
 
-- Frontend: `http://PUBLIC_IP:5173`
+- Frontend: `http://PUBLIC_IP`
 - API gateway: `http://PUBLIC_IP:8000`
 
 ## Cost Control

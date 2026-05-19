@@ -54,14 +54,6 @@ resource "aws_security_group" "cartlabs" {
   }
 
   ingress {
-    description = "Temporary frontend dev port"
-    from_port   = 5173
-    to_port     = 5173
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_http_cidr]
-  }
-
-  ingress {
     description = "API gateway"
     from_port   = 8000
     to_port     = 8000

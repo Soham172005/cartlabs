@@ -56,6 +56,14 @@ After apply, SSH into the instance, copy or clone CartLabs into `/opt/cartlabs`,
 docker compose up -d --build
 ```
 
+For production CI/CD deployments, Jenkins uses `docker-compose.prod.yml` to serve the frontend through Nginx on port `80`.
+
+## CI/CD
+
+The Jenkins pipeline is defined in `Jenkinsfile`.
+
+It validates secrets, checks backend syntax, builds the frontend, validates Docker Compose and deploys to the EC2 instance over SSH. Setup details are in `docs/jenkins-cicd.md`.
+
 ## Local Development
 
 Backend services are independent Django apps under `backend/`. Each service is built through the shared `backend/Dockerfile` using the `SERVICE_DIR` build argument.
