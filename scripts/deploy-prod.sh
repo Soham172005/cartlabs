@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_URL="${REPO_URL:-$(git config --get remote.origin.url 2>/dev/null || true)}"
 DEPLOY_PATH="${DEPLOY_PATH:-/opt/cartlabs}"
-GIT_BRANCH="${GIT_BRANCH:-main}"
+DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 PUBLIC_API_BASE_URL="${PUBLIC_API_BASE_URL:-http://localhost:8000/api}"
 
 if [[ -z "$REPO_URL" ]]; then
@@ -23,13 +23,13 @@ fi
 
 if [[ ! -d "$DEPLOY_PATH/.git" ]]; then
   rm -rf "$DEPLOY_PATH"
-  git clone --branch "$GIT_BRANCH" "$REPO_URL" "$DEPLOY_PATH"
+  git clone --branch "$DEPLOY_BRANCH" "$REPO_URL" "$DEPLOY_PATH"
 fi
 
 cd "$DEPLOY_PATH"
-git fetch origin "$GIT_BRANCH"
-git checkout "$GIT_BRANCH"
-git reset --hard "origin/$GIT_BRANCH"
+git fetch origin "$DEPLOY_BRANCH"
+git checkout "$DEPLOY_BRANCH"
+git reset --hard "origin/$DEPLOY_BRANCH"
 
 export PUBLIC_API_BASE_URL
 docker compose -f docker-compose.yml -f docker-compose.prod.yml build

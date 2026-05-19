@@ -50,7 +50,7 @@ sudo systemctl restart jenkins
 REPO_URL=https://github.com/YOUR_USERNAME/cartlabs.git
 DEPLOY_PATH=/opt/cartlabs
 PUBLIC_API_BASE_URL=http://13.200.16.11:8000/api
-GIT_BRANCH=main
+DEPLOY_BRANCH=main
 ```
 
 ## First Deployment

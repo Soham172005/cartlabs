@@ -11,7 +11,7 @@ pipeline {
     string(name: 'REPO_URL', defaultValue: 'https://github.com/YOUR_USERNAME/cartlabs.git', description: 'GitHub repository URL used by the EC2 deploy script')
     string(name: 'DEPLOY_PATH', defaultValue: '/opt/cartlabs', description: 'Application directory on production EC2')
     string(name: 'PUBLIC_API_BASE_URL', defaultValue: 'http://13.200.16.11:8000/api', description: 'Frontend API URL baked into the production build')
-    string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Branch to deploy')
+    string(name: 'DEPLOY_BRANCH', defaultValue: 'main', description: 'Branch to deploy')
   }
 
   environment {
@@ -62,14 +62,14 @@ pipeline {
 
     stage('Deploy Locally On EC2') {
       when {
-        expression { params.GIT_BRANCH == 'main' }
+        expression { params.DEPLOY_BRANCH == 'main' }
       }
       steps {
         sh '''
           chmod +x scripts/deploy-prod.sh
           REPO_URL="${REPO_URL}" \
           PUBLIC_API_BASE_URL="${PUBLIC_API_BASE_URL}" \
-          GIT_BRANCH="${GIT_BRANCH}" \
+          DEPLOY_BRANCH="${DEPLOY_BRANCH}" \
           DEPLOY_PATH="${DEPLOY_PATH}" \
           scripts/deploy-prod.sh
         '''
