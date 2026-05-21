@@ -1,5 +1,5 @@
 key_name         = "cart_labs"
-allowed_ssh_cidr = "49.36.104.110/32"
+allowed_ssh_cidr = "49.36.104.134/32"
 
 # Keep public for quick testing. Tighten this later if needed.
 allowed_http_cidr = "0.0.0.0/0"

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://13.200.16.11:8000/api";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://13.206.210.64:8000/api";
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 async function api(path, { token, ...options } = {}) {
